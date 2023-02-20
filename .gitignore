@@ -1,0 +1,8 @@
+*.txt
+*.swp
+*.bak
+*.patch
+*.mbox
+*.x
+nfsv42.x
+testx.d
