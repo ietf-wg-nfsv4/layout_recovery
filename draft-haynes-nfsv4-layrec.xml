@@ -190,14 +190,16 @@
     There are two error scenarios that can occur:
   </t>
   <dl newline="false" spacing="normal">
+    <dt>During the grace period:</dt>
     <dd>
-      During the grace period, if the client were to send any lrf_stateid
+      If the client were to send any lrf_stateid
       in the LAYOUTRETURN other than the anonymous stateid 
       of all zeros, then the metadata server would respond with an error of
       NFS4ERR_GRACE.
     </dd>
+    <dt>After the grace period:</dt>
     <dd>
-      After the grace period, if the client were to send any lrf_stateid
+      If the client were to send any lrf_stateid
       in the LAYOUTRETURN with the anonymous stateid 
       of all zeros, then the metadata server would respond with an error of
       NFS4ERR_NO_GRACE.
@@ -270,25 +272,10 @@
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
        href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8178.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
-       href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8434.xml"/>
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
        href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8435.xml"/>
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"
        href="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.8881.xml"/>
 
-  </references>
-
-  <references>
-  <name>Informative References</name>
-    <reference anchor="LEGAL" target="http://trustee.ietf.org/docs/IETF-Trust-License-Policy.pdf">
-      <front>
-        <title abbrev="Legal Provisions">Legal Provisions Relating to IETF Documents</title>
-        <author>
-          <organization>IETF Trust</organization>
-        </author>
-        <date month="November" year="2008"/>
-      </front>
-    </reference>
   </references>
 </references>
 
