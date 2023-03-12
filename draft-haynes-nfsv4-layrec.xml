@@ -176,6 +176,61 @@
     has to assume that the client could have written data whilst it held
     a layout of iomode LAYOUTIOMODE4_RW.
   </t>
+  <t>
+    If the server were to allow the client to use the anonymous stateid
+    of all zeros
+    (see Section 8.2.3 of <xref target="RFC8881" format="default" sectionFormat="of"/>) for
+    lrf_stateid in LAYOUTRETURN (see Section 18.44.1 of
+    <xref target="RFC8881" format="default" sectionFormat="of"/>),
+    then the client could inform the metadata server of errors
+    encountered. That in turn would allow the metadata server to
+    accurately resilver the file by picking the correct mirror(s).
+  </t>
+  <t>
+    There are two error scenarios that can occur:
+  </t>
+  <dl newline="false" spacing="normal">
+    <dd>
+      During the grace period, if the client were to send any lrf_stateid
+      in the LAYOUTRETURN other than the anonymous stateid 
+      of all zeros, then the metadata server would respond with an error of
+      NFS4ERR_GRACE.
+    </dd>
+    <dd>
+      After the grace period, if the client were to send any lrf_stateid
+      in the LAYOUTRETURN with the anonymous stateid 
+      of all zeros, then the metadata server would respond with an error of
+      NFS4ERR_NO_GRACE.
+    </dd>
+  </dl>
+  <t>
+    Also, when the metadata server builds the reply to the LAYOUTRETURN,
+    it <bcp14>MUST NOT</bcp14> bump the seqid of the lorr_stateid.
+  </t>
+  <t>
+    The metadata server <bcp14>MUST NOT</bcp14> have been resilvering the file
+    such that it has a different layout (set of mirror instances) than
+    the client before the restart of the metadata server.  Further, the
+    metadata server <bcp14>MUST NOT</bcp14> start a new resilvering of
+    the file during the grace period. If the metadata server is tracking
+    write intents (the number of outstanding layouts with iomode of
+    LAYOUTIOMODE4_RW), then it can relax this constraint and start a
+    resilvering once all write intents have been recovered for that file.
+  </t>
+  <t>
+    If the metadata server detects that the layout being returned in
+    the LAYOUTRETURN does not match the current mirror instances found
+    for the file, then it should ignore the LAYOUTRETURN and resilver the
+    file in question.
+  </t>
+  <t>
+    Finally, the metadata server <bcp14>MAY</bcp14> assume that any files
+    which are neither explicitly recovered with a CLAIM_PREVIOUS nor
+    have a reported error via a LAYOUTRETURN, do not need to be
+    resilvered. The client is most likely using the forgetful model
+    of returning layouts (see Section 12.5.5.1 of
+    <xref target="RFC8881" format="default" sectionFormat="of"/>).
+  </t>
 </section>
 
 <section anchor="sec_security" numbered="true" removeInRFC="false" toc="default">
