@@ -76,7 +76,7 @@
     (pNFS) Flexible File Layout (<xref target="RFC8435" format="default"
     sectionFormat="of"/>) server, during file recovery after a restart,
     there is no mechanism for the client
-    to inform the metadata servers for when an error occured during a
+    to inform the metadata servers for when an error occurred during a
     WRITE operation to the data servers.
   </t>
 
@@ -141,9 +141,40 @@
   </section>
 </section>
 
-<section anchor="op_LAYOUT_WCC" numbered="true" removeInRFC="false" toc="default">
-  <name>Operation 77: LAYOUT_WCC - Layout Weak Cache Consistency</name>
+<section anchor="file_recovery" numbered="true" removeInRFC="false" toc="default">
+  <name>File Recovery</name>
   <t>
+    When a metadata server restarts, clients are provided a grace period where
+    they are allowed to recover any state that
+    they had established. With open files, the client can send an OPEN (see
+    Section 18.16 of <xref target="RFC8881" format="default" sectionFormat="of"/>)
+    operation with a claim type of CLAIM_PREVIOUS (see Section 9.11 of
+    <xref target="RFC8881" format="default" sectionFormat="of"/>). The client
+    uses the RECLAIM_COMPLETE (see Section 18.51
+    of <xref target="RFC8881" format="default" sectionFormat="of"/>) operation
+    to notify the metadata server that it is done reclaiming state.
+  </t>
+  <t>
+    The NFSv4 Flexible File Layout Type allows for the client to mirror files
+    (see Section 8 of <xref target="RFC8435" format="default" sectionFormat="of"/>).
+    With client side mirroring, it is important for the client to inform
+    the metadata server of any I/O errors encountered with one of the mirrors.
+    This is the only way for the metadata server to determine one or more
+    of the mirrors is corrupt and then repair the mirrors via resilvering.
+    The client can use LAYOUTRETURN and the ff_ioerr4 structure to inform
+    the metadata server of I/O errors.
+  </t>
+  <t>
+    A problem is that if the metadata server restarts and the client has
+    errors it needs to report, it can not do so. The LAYOUTRETURN needs
+    a layout stateid to proceed and there is no way for the client to
+    recover layout state. As such, clients have no choice but to not recover
+    files with I/O errors. In turn, the metadata server <bcp14>MUST</bcp14>
+    assume that the mirrors are inconsistent and pick one for resilvering.
+    It is a <bcp14>MUST</bcp14> because as there is no control protocol
+    between the metadata server and the data servers, the metadata server
+    has to assume that the client could have written data whilst it held
+    a layout of iomode LAYOUTIOMODE4_RW.
   </t>
 </section>
 
