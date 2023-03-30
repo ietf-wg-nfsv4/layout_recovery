@@ -226,12 +226,10 @@
     file in question.
   </t>
   <t>
-    Finally, the metadata server <bcp14>MAY</bcp14> assume that any files
+    Finally, the metadata server <bcp14>MUST</bcp14> determine that any files
     which are neither explicitly recovered with a CLAIM_PREVIOUS nor
-    have a reported error via a LAYOUTRETURN, do not need to be
-    resilvered. The client is most likely using the forgetful model
-    of returning layouts (see Section 12.5.5.1 of
-    <xref target="RFC8881" format="default" sectionFormat="of"/>).
+    have a reported error via a LAYOUTRETURN, have to be
+    resilvered. The client has most likely restarted and lost any state.
   </t>
 </section>
 
@@ -282,7 +280,7 @@
 <section numbered="true" removeInRFC="false" toc="default">
       <name>Acknowledgments</name>
       <t>
-        None yet...
+        Tigran Mkrtchyan and Rick Macklem provided reviews of the document.
       </t>
     </section>
 
