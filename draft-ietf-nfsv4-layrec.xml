@@ -13,7 +13,6 @@
  symRefs="true"
  tocDepth="3"
  tocInclude="true"
- updates="8435"
  version="3"
  xml:lang="en">
 
@@ -46,12 +45,14 @@
       can still modify the data file component.  During the
       recovery phase of startup, the metadata server and the
       data servers work together to recover state (which files
-      are open, last modification time, size, etc). A problem
-      with servers which do client side mirroring there is no
-      means by which the client can report errors to the
+      are open, last modification time, size, etc). If the client
+      has not encountered errors with the data files, then the state can be
+      recovered, avoiding resilvering of the data files. With any
+      errors, there is no means by which the client can report errors to the
       metadata server. As such, the metadata server has to
-      assume that file needs resilvering. This document presents a
-      refinement to RFC8435 to allow the client to update the metadata
+      assume that file needs resilvering. This document presents an
+      extension to RFC8435 to allow the client to update the metadata
+      and avoid the resilvering.
     </t>
   </abstract>
 
@@ -74,10 +75,12 @@
   <t>
     In the Network File System version4 (NFSv4) with a Parallel NFS
     (pNFS) Flexible File Layout (<xref target="RFC8435" format="default"
-    sectionFormat="of"/>) server, during file recovery after a restart,
+    sectionFormat="of"/>) server, during recovery after a restart,
     there is no mechanism for the client
-    to inform the metadata servers for when an error occurred during a
-    WRITE operation to the data servers.
+    to inform the metadata server about an error which occurred during a
+    WRITE (see Section 18.32 of <xref target="RFC8881" format="default"
+    sectionFormat="of"/>) operation to the data servers in the period of
+    the outage.
   </t>
 
   <t>
@@ -141,8 +144,8 @@
   </section>
 </section>
 
-<section anchor="file_recovery" numbered="true" removeInRFC="false" toc="default">
-  <name>File Recovery</name>
+<section anchor="layout_state_recovery" numbered="true" removeInRFC="false" toc="default">
+  <name>Layout State Recovery</name>
   <t>
     When a metadata server restarts, clients are provided a grace period where
     they are allowed to recover any state that
@@ -161,7 +164,9 @@
     the metadata server of any I/O errors encountered with one of the mirrors.
     This is the only way for the metadata server to determine one or more
     of the mirrors is corrupt and then repair the mirrors via resilvering.
-    The client can use LAYOUTRETURN and the ff_ioerr4 structure to inform
+    The client can use LAYOUTRETURN (see
+    Section 18.44 of <xref target="RFC8881" format="default" sectionFormat="of"/>)
+    and the ff_ioerr4 (see Section 9.1.1 of <xref target="RFC8435" format="default" sectionFormat="of"/>) structure to inform
     the metadata server of I/O errors.
   </t>
   <t>
@@ -171,10 +176,9 @@
     recover layout state. As such, clients have no choice but to not recover
     files with I/O errors. In turn, the metadata server <bcp14>MUST</bcp14>
     assume that the mirrors are inconsistent and pick one for resilvering.
-    It is a <bcp14>MUST</bcp14> because as there is no control protocol
-    between the metadata server and the data servers, the metadata server
-    has to assume that the client could have written data whilst it held
-    a layout of iomode LAYOUTIOMODE4_RW.
+    It is a <bcp14>MUST</bcp14> because even if the metadata server can
+    determine that the client did modify data during the outage, it <bcp14>MUST NOT</bcp14>
+    assume those modifications were consistent.
   </t>
   <t>
     If the server were to allow the client to use the anonymous stateid
@@ -195,14 +199,14 @@
       If the client were to send any lrf_stateid
       in the LAYOUTRETURN other than the anonymous stateid 
       of all zeros, then the metadata server would respond with an error of
-      NFS4ERR_GRACE.
+      NFS4ERR_GRACE (see Section of 15.1.9.2 <xref target="RFC8881" format="default" sectionFormat="of"/>).
     </dd>
     <dt>After the grace period:</dt>
     <dd>
       If the client were to send any lrf_stateid
       in the LAYOUTRETURN with the anonymous stateid 
       of all zeros, then the metadata server would respond with an error of
-      NFS4ERR_NO_GRACE.
+      NFS4ERR_NO_GRACE (see Section 15.1.9.3 of <xref target="RFC8881" format="default" sectionFormat="of"/>).
     </dd>
   </dl>
   <t>
@@ -280,7 +284,7 @@
 <section numbered="true" removeInRFC="false" toc="default">
       <name>Acknowledgments</name>
       <t>
-        Tigran Mkrtchyan and Rick Macklem provided reviews of the document.
+        Tigran Mkrtchyan, Jeff Layton, and Rick Macklem provided reviews of the document.
       </t>
     </section>
 
