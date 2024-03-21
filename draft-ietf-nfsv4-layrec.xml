@@ -214,14 +214,21 @@
     it <bcp14>MUST NOT</bcp14> bump the seqid of the lorr_stateid.
   </t>
   <t>
+    The metadata server <bcp14>MUST NOT</bcp14> resilver a file if there
+    are clients with outstanding layouts with iomode of
+    LAYOUTIOMODE4_RW. Whether the metadata server prevents all I/O to
+    the file until the resilvering is done or forces all I/O to go through
+    the metadata server or allows a proxy server to update the new data
+    file as it is being reslivered is all an implementation choice. The
+    constraint is that the metadata server is responsible for the
+    reconstruction of the data file and for the consistency of the
+    mirrors.
     The metadata server <bcp14>MUST NOT</bcp14> have been resilvering the file
     such that it has a different layout (set of mirror instances) than
     the client before the restart of the metadata server.  Further, the
     metadata server <bcp14>MUST NOT</bcp14> start a new resilvering of
-    the file during the grace period. If the metadata server is tracking
-    write intents (the number of outstanding layouts with iomode of
-    LAYOUTIOMODE4_RW), then it can relax this constraint and start a
-    resilvering once all write intents have been recovered for that file.
+    the file during the grace period unless there are no outstanding layouts with iomode of
+    LAYOUTIOMODE4_RW.
   </t>
   <t>
     If the metadata server detects that the layout being returned in
