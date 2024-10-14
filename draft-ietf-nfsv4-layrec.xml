@@ -215,6 +215,22 @@
     have a reported error via a LAYOUTRETURN, have to be
     resilvered. The client has most likely restarted and lost any state.
   </t>
+
+  <section anchor='sec_vers_mismatch' numbered='true' removeInRFC='false' toc='default'>
+    <name>Version Mismatch Considerations</name>
+    <t>
+      The metadata server has no expectations for the client to use this
+      new functionality. Therefore, if the client does not use it, the
+      metadata server will function normally.
+    </t>
+    <t>
+      If the client does use the new functionality and the metadata server does
+      not support it, then the metadata server will most likely reply with
+      a NFS4ERR_BAD_STATEID to the LAYOUTRETURN. If the client detects
+      a NFS4ERR_BAD_STATEID error in this scenario, it should fall back to
+      the old behavior of not reporting errors.
+    </t>
+  </section>
 </section>
 
 <section anchor='sec_security' numbered='true' removeInRFC='false' toc='default'>
