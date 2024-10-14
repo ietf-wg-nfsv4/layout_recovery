@@ -98,36 +98,8 @@
     <name>Definitions</name>
     <t>
       See Section 1.1 of <xref target='RFC8435' format='default'
-      sectionFormat='of'/> for a more complete set of definitions.
+      sectionFormat='of'/> for a set of definitions.
     </t>
-
-    <dl newline='false' spacing='normal'>
-      <dt>(file) data:</dt>
-      <dd>
-        that part of the file system object that contains the
-        data to be read or written.  It is the contents of the object
-        rather than the attributes of the object.
-      </dd>
-
-      <dt>data server (DS):</dt>
-      <dd>
-        a pNFS server that provides the file's data when
-        the file system object is accessed over a file-based protocol.
-      </dd>
-
-      <dt>(file) metadata:</dt>
-      <dd>
-        the part of the file system object that contains
-        various descriptive data relevant to the file object, as opposed
-        to the file data itself.  This could include the time of last
-        modification, access time, EOF position, etc.
-      </dd>
-
-      <dt>metadata server (MDS):</dt>
-      <dd>
-        the pNFS server that provides metadata information for a file system object.
-      </dd>
-    </dl>
   </section>
   <section numbered='true' removeInRFC='false' toc='default'>
     <name>Requirements Language</name>
