@@ -244,7 +244,7 @@
 <section anchor='sec_iana' numbered='true' removeInRFC='false' toc='default'>
   <name>IANA Considerations</name>
   <t>
-    IANA should use the current document (RFC-TBD) as the reference for the new entries.
+    There are no IANA considerations for this document.
   </t>
 </section>
 
