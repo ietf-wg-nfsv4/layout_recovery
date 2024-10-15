@@ -161,67 +161,117 @@
     assume those modifications were consistent.
   </t>
   <t>
-    If the server were to allow the client to use the anonymous stateid
-    of all zeros
-    (see Section 8.2.3 of <xref target='RFC8881' format='default' sectionFormat='of'/>) for
-    lrf_stateid in LAYOUTRETURN (see Section 18.44.1 of
-    <xref target='RFC8881' format='default' sectionFormat='of'/>),
-    then the client could inform the metadata server of errors
-    encountered. That in turn would allow the metadata server to
-    accurately resilver the file by picking the correct mirror(s).
+    To fix this issue, the metadata server <bcp14>MUST</bcp14> accept
+    for the lrf_stateid in LAYOUTRETURN (see Section 18.44.1 of
+    <xref target='RFC8881' format='default' sectionFormat='of'/>)
+    the anonymous stateid of all zeros
+    (see Section 8.2.3 of <xref target='RFC8881' format='default' sectionFormat='of'/>).
+    The client can use this anonymous stateid to
+    inform the metadata server of errors
+    encountered. The metadata server can then
+    accurately resilver the file by picking the mirror(s) that do not
+    have any associated errors.
   </t>
   <t>
-    There are two error scenarios that can occur:
+    During the grace period, if the client sends a lrf_stateid
+    in the LAYOUTRETURN with any value other than the
+    anonymous stateid of all zeros, then the metadata server
+    <bcp14>MUST</bcp14> now respond with an error of
+    NFS4ERR_GRACE (see Section of 15.1.9.2 <xref target='RFC8881' format='default' sectionFormat='of'/>).
+    After the grace period, if the client sends a lrf_stateid
+    in the LAYOUTRETURN with a value of the anonymous stateid of all zeros, then the metadata server
+    <bcp14>MUST</bcp14> now respond with an error of
+    NFS4ERR_NO_GRACE (see Section 15.1.9.3 of <xref target='RFC8881' format='default' sectionFormat='of'/>).
   </t>
-  <dl newline='false' spacing='normal'>
-    <dt>During the grace period:</dt>
-    <dd>
-      If the client were to send any lrf_stateid
-      in the LAYOUTRETURN other than the anonymous stateid 
-      of all zeros, then the metadata server would respond with an error of
-      NFS4ERR_GRACE (see Section of 15.1.9.2 <xref target='RFC8881' format='default' sectionFormat='of'/>).
-    </dd>
-    <dt>After the grace period:</dt>
-    <dd>
-      If the client were to send any lrf_stateid
-      in the LAYOUTRETURN with the anonymous stateid 
-      of all zeros, then the metadata server would respond with an error of
-      NFS4ERR_NO_GRACE (see Section 15.1.9.3 of <xref target='RFC8881' format='default' sectionFormat='of'/>).
-    </dd>
-  </dl>
   <t>
-    Also, when the metadata server builds the reply to the LAYOUTRETURN,
+    Also, when the metadata server builds the reply to the LAYOUTRETURN
+    when a lrf_stateid with the value of the anonymous stateid of all zeros
     it <bcp14>MUST NOT</bcp14> bump the seqid of the lorr_stateid.
-  </t>
-  <t>
-    The metadata server <bcp14>MUST NOT</bcp14> resilver a file if there
-    are clients with outstanding layouts with iomode of
-    LAYOUTIOMODE4_RW. Whether the metadata server prevents all I/O to
-    the file until the resilvering is done or forces all I/O to go through
-    the metadata server or allows a proxy server to update the new data
-    file as it is being reslivered is all an implementation choice. The
-    constraint is that the metadata server is responsible for the
-    reconstruction of the data file and for the consistency of the
-    mirrors.
-    The metadata server <bcp14>MUST NOT</bcp14> have been resilvering the file
-    such that it has a different layout (set of mirror instances) than
-    the client before the restart of the metadata server.  Further, the
-    metadata server <bcp14>MUST NOT</bcp14> start a new resilvering of
-    the file during the grace period unless there are no outstanding layouts with iomode of
-    LAYOUTIOMODE4_RW.
   </t>
   <t>
     If the metadata server detects that the layout being returned in
     the LAYOUTRETURN does not match the current mirror instances found
-    for the file, then it should ignore the LAYOUTRETURN and resilver the
+    for the file, then it <bcp14>MUST</bcp14> ignore the LAYOUTRETURN and resilver the
     file in question.
   </t>
   <t>
-    Finally, the metadata server <bcp14>MUST</bcp14> resilver any files
+    The metadata server <bcp14>MUST</bcp14> resilver any files
     which are neither explicitly recovered with a CLAIM_PREVIOUS nor
     have a reported error via a LAYOUTRETURN.
     The client has most likely restarted and lost any state.
   </t>
+  <section anchor='sec_when_to_resilver' numbered='true' removeInRFC='false' toc='default'>
+    <name>When to Resilver</name>
+    <t>
+      A write intent occurs when a client opens a file and gets
+      a LAYOUTIOMODE4_RW from the metadata server. The metadata server
+      <bcp14>MUST</bcp14> track outstanding write intents and when it
+      restarts, it <bcp14>MUST</bcp14> track recovery of those
+      write intents.
+      The method that the metadata server uses to track write intents is
+      implementation specific, i.e., outside of the scope of this document.
+    </t>
+    <t>
+      The decision to resilver a file depends on how the client recovers the
+      file before the grace period ends. If the client reclaims the file
+      and reports no errors, the metadata server <bcp14>MUST NOT</bcp14>
+      resilver the file. If the client reports an error on the file,
+      then the file <bcp14>MUST</bcp14> be resilvered. If the client
+      does not reclaim or report an error before the grace period ends,
+      then under the old behvior, the metadata server <bcp14>MUST</bcp14>
+      resilver the file.
+    </t>
+    <t>
+      The resilvering process is broadly to:
+    </t>
+    <ol>
+      <li>
+        fence the file (see Section 2.2
+        of <xref target='RFC8435' format='default' sectionFormat='of'/>),
+      </li>
+      <li>
+        record the need to resilver,
+      </li>
+      <li>
+        release the write intent, and
+      </li>
+      <li>
+        once there are no write intents on the file, start the resilvering process.
+      </li>
+    </ol>
+    <t>
+      The metadata server <bcp14>MUST NOT</bcp14> resilver a file if there
+      are clients with outstanding write intents. I.e., multiple clients
+      might have the file open with write intents.  As it <bcp14>MUST</bcp14>
+      track write intents, it <bcp14>MUST</bcp14> also track the need to
+      resilver. I.e., if the metadata server restarts during the grace
+      period, it <bcp14>MUST</bcp14> restart the file recovery if it
+      replays the write intent else it <bcp14>MUST</bcp14> start
+      the resilvering if it replays the resilvering intent.
+    </t>
+
+    <t>
+      Whether the metadata server prevents all I/O to
+      the file until the resilvering is done or forces all I/O to go through
+      the metadata server or allows a proxy server to update the new data
+      file as it is being reslivered is all an implementation choice. The
+      constraint is that the metadata server is responsible for the
+      reconstruction of the data file and for the consistency of the
+      mirrors.
+    </t>
+
+    <t>
+      If the metadata server does allow the client access to the
+      file during the resilvering, then the client <bcp14>MUST</bcp14> have
+      the same layout (set of mirror instances) after the metadata server
+      as before. One way that such a resilvering can occur is for a proxy
+      server to be inserted into the layout. That server will be copying
+      a good mirror instance to a new instance. As it gets I/O via the
+      layout, it will be responsible for updating the copy it is performing.
+      This requirement is that the proxy server <bcp14>MUST</bcp14>
+      stay in the layout until the grace period is finished.
+    </t>
+  </section>
 
   <section anchor='sec_vers_mismatch' numbered='true' removeInRFC='false' toc='default'>
     <name>Version Mismatch Considerations</name>
