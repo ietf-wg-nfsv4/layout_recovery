@@ -120,7 +120,7 @@
 <section anchor='layout_state_recovery' numbered='true' removeInRFC='false' toc='default'>
   <name>Layout State Recovery</name>
   <t>
-    When a metadata server restarts, clients are provided a grace period where
+    When a metadata server restarts, clients are provided a grace recovery period where
     they are allowed to recover any state that
     they had established. With open files, the client can send an OPEN (see
     Section 18.16 of <xref target='RFC8881' format='default' sectionFormat='of'/>)
@@ -143,9 +143,16 @@
     the metadata server of I/O errors.
   </t>
   <t>
-    A problem is that if the metadata server restarts and the client has
-    errors it needs to report, it can not do so. The LAYOUTRETURN needs
-    a layout stateid to proceed and there is no way for the client to
+    A problem is that when the metadata server restarts and the client has
+    errors it needs to report, it can not do so. Section 12.7.4 of
+    <xref target='RFC8881' format='default' sectionFormat='of'/> requires
+    that the client <bcp14>MUST</bcp14> stop using layouts. While the
+    intent there is that the client <bcp14>MUST</bcp14> stop doing I/O
+    to the storage devices, it is also true that the layout stateids
+    are no longer valid.  The LAYOUTRETURN needs
+    a layout stateid to proceed and the client can not get a layout
+    during grace recovery (see Section 12.7.4 of
+    <xref target='RFC8881' format='default' sectionFormat='of'/>) to
     recover layout state. As such, clients have no choice but to not recover
     files with I/O errors. In turn, the metadata server <bcp14>MUST</bcp14>
     assume that the mirrors are inconsistent and pick one for resilvering.
