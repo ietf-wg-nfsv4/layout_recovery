@@ -210,10 +210,10 @@
     file in question.
   </t>
   <t>
-    Finally, the metadata server <bcp14>MUST</bcp14> determine that any files
+    Finally, the metadata server <bcp14>MUST</bcp14> resilver any files
     which are neither explicitly recovered with a CLAIM_PREVIOUS nor
-    have a reported error via a LAYOUTRETURN, have to be
-    resilvered. The client has most likely restarted and lost any state.
+    have a reported error via a LAYOUTRETURN.
+    The client has most likely restarted and lost any state.
   </t>
 
   <section anchor='sec_vers_mismatch' numbered='true' removeInRFC='false' toc='default'>
