@@ -46,7 +46,7 @@
       can still modify the data file component.  During the
       recovery phase of startup, the metadata server and the
       data servers work together to recover state (which files
-      are open, last modification time, size, etc). If the client
+      are open, last modification time, size, etc.). If the client
       has not encountered errors with the data files, then the state can be
       recovered, avoiding resilvering of the data files. With any
       errors, there is no means by which the client can report errors to the
