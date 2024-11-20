@@ -218,7 +218,7 @@
       resilver the file. If the client reports an error on the file,
       then the file <bcp14>MUST</bcp14> be resilvered. If the client
       does not reclaim or report an error before the grace period ends,
-      then under the old behvior, the metadata server <bcp14>MUST</bcp14>
+      then under the old behavior, the metadata server <bcp14>MUST</bcp14>
       resilver the file.
     </t>
     <t>
