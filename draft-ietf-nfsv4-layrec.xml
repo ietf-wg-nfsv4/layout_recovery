@@ -282,7 +282,7 @@
     </t>
     <t>
       If the client does use the new functionality and the metadata server does
-      not support it, then the metadata server will most likely reply with
+      not support it, then the metadata server <bcp14>MUST</bcp14> reply with
       a NFS4ERR_BAD_STATEID to the LAYOUTRETURN. If the client detects
       a NFS4ERR_BAD_STATEID error in this scenario, it should fall back to
       the old behavior of not reporting errors.
