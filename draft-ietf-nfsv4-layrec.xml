@@ -100,6 +100,16 @@
       See Section 1.1 of <xref target='RFC8435' format='default'
       sectionFormat='of'/> for a set of definitions.
     </t>
+
+    <dl newline="false" spacing="normal">
+      <dt>resilvering:</dt>
+      <dd>
+        the act of rebuilding a mirrored copy of a layout segment from a
+        known good copy of the layout segment.  Note that this can also
+        be done to create a new mirrored copy of the layout segment.
+      </dd>
+    </dl>
+
   </section>
   <section numbered='true' removeInRFC='false' toc='default'>
     <name>Requirements Language</name>
