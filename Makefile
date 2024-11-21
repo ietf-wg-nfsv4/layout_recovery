@@ -4,9 +4,9 @@
 YEAR=`date +%Y`
 MONTH=`date +%B`
 DAY=`date +%d`
-VERS=03
+VERS=04
 
-BASEDOC=draft-ietf-nfsv4-layrec
+BASEDO4=draft-ietf-nfsv4-layrec
 
 all: $(BASEDOC)-$(VERS).xml
 
