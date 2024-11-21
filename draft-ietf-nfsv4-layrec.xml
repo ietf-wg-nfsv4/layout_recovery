@@ -100,16 +100,6 @@
       See Section 1.1 of <xref target='RFC8435' format='default'
       sectionFormat='of'/> for a set of definitions.
     </t>
-
-    <dl newline="false" spacing="normal">
-      <dt>resilvering:</dt>
-      <dd>
-        the act of rebuilding a mirrored copy of a layout segment from a
-        known good copy of the layout segment.  Note that this can also
-        be done to create a new mirrored copy of the layout segment.
-      </dd>
-    </dl>
-
   </section>
   <section numbered='true' removeInRFC='false' toc='default'>
     <name>Requirements Language</name>
@@ -146,7 +136,8 @@
     With client side mirroring, it is important for the client to inform
     the metadata server of any I/O errors encountered with one of the mirrors.
     This is the only way for the metadata server to determine one or more
-    of the mirrors is corrupt and then repair the mirrors via resilvering.
+    of the mirrors is corrupt and then repair the mirrors via resilvering
+    (see Section 1.1 of <xref target='RFC8435' format='default' sectionFormat='of'/>).
     The client can use LAYOUTRETURN (see
     Section 18.44 of <xref target='RFC8881' format='default' sectionFormat='of'/>)
     and the ff_ioerr4 (see Section 9.1.1 of <xref target='RFC8435' format='default' sectionFormat='of'/>) structure to inform
